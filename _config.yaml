@@ -1,3 +1,10 @@
-theme: jekyll-theme-minimal
-title: TBS's homepage
-description: Bookmark this to keep an eye on my project updates!
+title: TBS’s homepage
+description: Learning notes
+remote_theme: just-the-docs/just-the-docs
+color_scheme: light
+
+# Optional extras
+logo: /assets/logo.png
+aux_links:
+  "View on GitHub":
+    - "https://github.com/boonsiangteh/boonsiangteh.github.io"
