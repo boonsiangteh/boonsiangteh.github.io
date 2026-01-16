@@ -4,36 +4,39 @@ title: Spring Boot – Practical Mental Model & Reference Notes
 nav_order: 2
 parent: Docs
 ---
+
 ## Spring Boot – Practical Mental Model & Reference Notes
 
 This document captures the essential concepts behind Spring Boot and the surrounding Spring ecosystem.
 The goal is not to memorize annotations, but to understand how requests flow, how objects are created, and why Spring exists in the first place.
 
-⸻
+---
 
-1. What Spring Boot Is (and What It Is Not)
+## 1. What Spring Boot Is (and What It Is Not)
 
-What
+### What
 
 Spring Boot is an opinionated framework built on top of the Spring Framework that helps you create production-ready Java/Kotlin applications quickly.
 
 It provides:
-	•	Auto-configuration
-	•	Embedded servers (Tomcat, Jetty, Netty)
-	•	Sensible defaults
-	•	Minimal boilerplate
+- Auto-configuration
+- Embedded servers (Tomcat, Jetty, Netty)
+- Sensible defaults
+- Minimal boilerplate
 
-What It Is Not
-	•	It is not a web server itself
-	•	It is not an ORM
-	•	It does not replace Spring Core
+### What It Is Not
+
+- It is not a web server itself.
+- It is not an ORM.
+- It does not replace Spring Core.
 
 Spring Boot simply wires things together for you, so you don’t have to.
 
-⸻
+---
 
-2. High-Level Request Flow (Big Picture)
+## 2. High-Level Request Flow (Big Picture)
 
+```
 HTTP Request
    |
    v
@@ -53,172 +56,186 @@ DispatcherServlet (Front Controller)
    |
    v
 Database
+```
 
 Understanding this flow explains 90% of Spring Boot behavior.
 
-⸻
+---
 
-3. Servlet Containers & Servlets
+## 3. Servlet Containers & Servlets
 
-Servlet Container
+### Servlet Container
 
-What
+**What**
+
 A Servlet Container (e.g. Tomcat) is a runtime that:
-	•	Listens on ports
-	•	Accepts HTTP requests
-	•	Manages servlet lifecycle
+- Listens on ports
+- Accepts HTTP requests
+- Manages servlet lifecycle
 
-Why
+**Why**
+
 Java web applications need a standardized environment to handle HTTP.
 The servlet container provides this environment.
 
-How
+**How**
+
 Spring Boot embeds Tomcat by default:
 
+```
 Spring Boot App
  └── Embedded Tomcat
      └── Servlet API
+```
 
 You don’t deploy WAR files anymore; you run a JAR.
 
-⸻
+### Servlets
 
-Servlets
+**What**
 
-What
 A Servlet is a Java class that handles HTTP requests.
 
-Why
+**Why**
+
 They provide a low-level, standardized API for HTTP handling.
 
-How
+**How**
+
 Spring hides raw servlets behind abstractions.
 You rarely write servlets yourself.
 
-⸻
+---
 
-4. DispatcherServlet (Front Controller Pattern)
+## 4. DispatcherServlet (Front Controller Pattern)
 
-What
+**What**
 
-DispatcherServlet is Spring MVC’s front controller.
+`DispatcherServlet` is Spring MVC’s front controller.
 
-Why
+**Why**
 
 Instead of many servlets handling requests independently, Spring routes all requests through one place.
 
-How
-	•	Every HTTP request hits DispatcherServlet
-	•	It finds the correct controller method
-	•	It handles argument binding, validation, serialization
+**How**
+
+- Every HTTP request hits `DispatcherServlet`.
+- It finds the correct controller method.
+- It handles argument binding, validation, serialization.
 
 You never create it manually—Spring Boot auto-configures it.
 
-⸻
+---
 
-5. ApplicationContext
+## 5. ApplicationContext
 
-What
+**What**
 
-ApplicationContext is Spring’s container of objects (beans).
+`ApplicationContext` is Spring’s container of objects (beans).
 
-Why
+**Why**
 
 Applications need a controlled way to:
-	•	Create objects
-	•	Manage lifecycles
-	•	Inject dependencies
+- Create objects
+- Manage lifecycles
+- Inject dependencies
 
-How
+**How**
 
 At startup:
-	1.	Spring scans your classpath
-	2.	Finds annotated classes
-	3.	Creates beans
-	4.	Stores them in the ApplicationContext
+1. Spring scans your classpath.
+2. Finds annotated classes.
+3. Creates beans.
+4. Stores them in the `ApplicationContext`.
 
+```
 ApplicationContext
  ├── Controller bean
  ├── Service bean
  ├── Repository bean
  └── Other infrastructure beans
+```
 
+---
 
-⸻
+## 6. Beans
 
-6. Beans
-
-What
+**What**
 
 A bean is an object managed by Spring.
 
-Why
+**Why**
 
 Spring can:
-	•	Control lifecycle
-	•	Inject dependencies
-	•	Apply cross-cutting concerns (transactions, security, logging)
+- Control lifecycle
+- Inject dependencies
+- Apply cross-cutting concerns (transactions, security, logging)
 
-How
+**How**
 
 Beans are created via:
-	•	Component scanning
-	•	Configuration classes
-	•	Auto-configuration
+- Component scanning
+- Configuration classes
+- Auto-configuration
 
 Most beans are singletons by default.
 
-⸻
+---
 
-7. Dependency Injection (DI)
+## 7. Dependency Injection (DI)
 
-What
+**What**
 
 Dependency Injection means objects do not create their own dependencies.
 
-Why
-	•	Loose coupling
-	•	Easier testing
-	•	Clear object responsibilities
+**Why**
 
-How
+- Loose coupling
+- Easier testing
+- Clear object responsibilities
+
+**How**
 
 Spring injects dependencies via:
-	•	Constructor injection (recommended)
-	•	Field injection (discouraged)
-	•	Setter injection (rare)
+- Constructor injection (recommended)
+- Field injection (discouraged)
+- Setter injection (rare)
 
-Example (Constructor Injection)
+**Example (Constructor Injection)**
 
+```kotlin
 @Service
 class OrderService(
     private val paymentService: PaymentService
 )
+```
 
 Spring:
-	•	Creates PaymentService
-	•	Passes it into OrderService
+- Creates `PaymentService`
+- Passes it into `OrderService`
 
-⸻
+---
 
-8. Core Stereotype Annotations
+## 8. Core Stereotype Annotations
 
 These annotations mark roles in your application.
 
-⸻
+### `@Controller`
 
-@Controller
+**What**
 
-What
 Marks a class as a web controller.
 
-Why
+**Why**
+
 Spring needs to know which classes handle HTTP requests.
 
-How
-	•	Used with @RequestMapping, @GetMapping, etc.
-	•	Returns responses (JSON, views, etc.)
+**How**
 
+- Used with `@RequestMapping`, `@GetMapping`, etc.
+- Returns responses (JSON, views, etc.)
+
+```kotlin
 @Controller
 class UserController {
 
@@ -227,189 +244,195 @@ class UserController {
         return listOf("Alice", "Bob")
     }
 }
+```
 
+### `@Service`
 
-⸻
+**What**
 
-@Service
-
-What
 Marks a class as business logic.
 
-Why
+**Why**
+
 Separates business rules from HTTP and persistence concerns.
 
-How
-Spring treats it as a bean and allows:
-	•	Transactions
-	•	Reuse across controllers
+**How**
 
+Spring treats it as a bean and allows:
+- Transactions
+- Reuse across controllers
+
+```kotlin
 @Service
 class UserService {
     fun processUser() {}
 }
+```
 
+### `@Repository`
 
-⸻
+**What**
 
-@Repository
-
-What
 Marks a class responsible for data access.
 
-Why
-	•	Clear architectural boundary
-	•	Exception translation (DB → Spring exceptions)
+**Why**
 
-How
+- Clear architectural boundary
+- Exception translation (DB → Spring exceptions)
+
+**How**
+
 Usually used for custom data access logic.
 
-⸻
+### JPA Repository
 
-JPA Repository
+**What**
 
-What
 Spring Data JPA provides repository interfaces with CRUD methods.
 
-Why
+**Why**
+
 Eliminates boilerplate DAO code.
 
-How
+**How**
+
 You define an interface, Spring generates implementation at runtime.
 
+```kotlin
 interface UserRepository : JpaRepository<User, Long>
+```
 
 You get:
-	•	save
-	•	findById
-	•	findAll
-	•	delete
+- `save`
+- `findById`
+- `findAll`
+- `delete`
 
 For free.
 
-⸻
+---
 
-9. Validation
+## 9. Validation
 
-What
+**What**
 
 Bean Validation checks request data against constraints.
 
-Why
+**Why**
 
 Protects your system from invalid input.
 
-How
-	•	Use @Valid in controllers
-	•	Use constraint annotations on DTO fields
+**How**
 
+- Use `@Valid` in controllers.
+- Use constraint annotations on DTO fields.
+
+```kotlin
 data class CreateUserRequest(
     @field:NotBlank
     val name: String
 )
+```
 
 Spring:
-	•	Validates automatically
-	•	Returns 400 Bad Request on failure
+- Validates automatically
+- Returns 400 Bad Request on failure
 
-⸻
+---
 
-10. Unit Testing in Spring
+## 10. Unit Testing in Spring
 
-What
+**What**
 
 Unit tests verify one class in isolation.
 
-Why
-	•	Fast
-	•	Precise
-	•	Easy to debug
+**Why**
 
-How
-	•	No Spring context
-	•	Dependencies are mocked
+- Fast
+- Precise
+- Easy to debug
 
-⸻
+**How**
 
-11. MockK
+- No Spring context
+- Dependencies are mocked
 
-What
+---
+
+## 11. MockK
+
+**What**
 
 MockK is a Kotlin-first mocking library.
 
-Why
+**Why**
 
 Mockito struggles with Kotlin features.
 
-How
+**How**
 
+```kotlin
 val repo = mockk<UserRepository>()
 every { repo.findAll() } returns emptyList()
+```
 
 MockK:
-	•	Creates fake implementations
-	•	Controls behavior
+- Creates fake implementations
+- Controls behavior
 
-⸻
+---
 
-12. MockMvc
+## 12. MockMvc
 
-What
+**What**
 
 MockMvc simulates HTTP requests without starting a server.
 
-Why
-	•	Test controllers realistically
-	•	Fast execution
+**Why**
 
-How
+- Test controllers realistically
+- Fast execution
+
+**How**
 
 MockMvc sends fake HTTP requests to Spring MVC:
 
+```kotlin
 mockMvc.perform(get("/users"))
     .andExpect(status().isOk)
+```
 
+---
 
-⸻
+## 13. Integration Testing in Spring
 
-13. Integration Testing in Spring
-
-What
+**What**
 
 Integration tests load the Spring context and test components working together.
 
-Why
-	•	Catch wiring issues
-	•	Validate configuration
-	•	Test real behavior
+**Why**
 
-How
+- Catch wiring issues
+- Validate configuration
+- Test real behavior
+
+**How**
 
 Spring Boot spins up:
-	•	ApplicationContext
-	•	Beans
-	•	Embedded infrastructure
+- `ApplicationContext`
+- Beans
+- Embedded infrastructure
 
-⸻
+### Common Integration Test Annotations
 
-Common Integration Test Annotations
+- `@SpringBootTest` — Loads the full application context.
+- `@AutoConfigureMockMvc` — Provides `MockMvc` with real Spring wiring.
+- `@ActiveProfiles("test")` — Uses test-specific configuration.
+- `@ExtendWith(SpringExtension::class)` — Integrates JUnit with Spring.
 
-@SpringBootTest
-Loads the full application context.
+### Typical Integration Test Setup
 
-@AutoConfigureMockMvc
-Provides MockMvc with real Spring wiring.
-
-@ActiveProfiles("test")
-Uses test-specific configuration.
-
-@ExtendWith(SpringExtension::class)
-Integrates JUnit with Spring.
-
-⸻
-
-Typical Integration Test Setup
-
+```kotlin
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -418,43 +441,44 @@ class UserIntegrationTest {
     @Autowired
     lateinit var mockMvc: MockMvc
 }
+```
 
 This:
-	•	Loads the real app
-	•	Uses test config
-	•	Allows HTTP-level testing
+- Loads the real app
+- Uses test config
+- Allows HTTP-level testing
 
-⸻
+---
 
-14. Mental Model Summary
+## 14. Mental Model Summary
 
 If you remember only this:
-	•	Spring Boot starts the system
-	•	Tomcat accepts requests
-	•	DispatcherServlet routes requests
-	•	Controllers handle HTTP
-	•	Services contain logic
-	•	Repositories access data
-	•	ApplicationContext manages everything
-	•	Tests choose how much of Spring to load
+- Spring Boot starts the system
+- Tomcat accepts requests
+- DispatcherServlet routes requests
+- Controllers handle HTTP
+- Services contain logic
+- Repositories access data
+- ApplicationContext manages everything
+- Tests choose how much of Spring to load
 
 You understand Spring Boot.
 
-⸻
+---
 
-15. When Things Go Wrong
+## 15. When Things Go Wrong
 
 Most Spring issues fall into one of these buckets:
-	•	Bean not found → component scanning / configuration issue
-	•	Validation not triggered → missing @Valid
-	•	Test slow → loading too much context
-	•	Runtime wiring errors → integration test needed
+- Bean not found → component scanning / configuration issue
+- Validation not triggered → missing `@Valid`
+- Test slow → loading too much context
+- Runtime wiring errors → integration test needed
 
 Spring is predictable once the mental model is clear.
 
-⸻
+---
 
-Final Thought
+## Final Thought
 
 Spring Boot is less about magic and more about conventions plus a container.
 Once you know who creates objects, who owns lifecycles, and how requests flow, the framework becomes boring—in a good way.
